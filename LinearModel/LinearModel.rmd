@@ -1,0 +1,89 @@
+---
+title: "Linear Model"
+author: "Brianna Olvera"
+date: "October 23, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+myData = read.csv('RawData.csv')
+```
+
+
+# First Model:
+SIMS is a function of ARM
+
+```{r}
+model1 = lm(SIMS~ARM, data=myData)
+summary(model1)
+```
+
+predict SIMS fro ARM = 88
+
+```{r}
+x = data.frame(GRIP=94, ARM=88)
+predSIMS = predict.lm(model1, x)
+print(predSIMS)
+```
+
+prediction interval:
+```{r}
+predict(model1, x, interval="predict", level=0.95)
+```
+
+
+# Second model SIMS is a function of GRIP
+
+```{r}
+model2 = lm(SIMS~GRIP, data=myData)
+summary(model2)
+```
+
+predict SIMS fro GRIP = 94
+
+```{r}
+predictSIMS2 = predict.lm(model2, x)
+print(predictSIMS2)
+```
+
+
+prediction interval:
+
+```{r}
+predict(model2, x, interval="predict")
+```
+
+# Third Model SIMS is a function of GRIP + ARM
+
+```{r}
+model3 = lm(SIMS~GRIP+ARM, data=myData)
+summary(model3)
+```
+
+predict SIMS fro ARM=88 and GRIP=94
+
+```{r}
+predictSIMS3 = predict.lm(model3, x)
+print(predictSIMS3)
+```
+
+
+prediction interval for model3
+
+blah .. blah..
+
+comparison between models 1 and 3
+
+```{r}
+anova(model1, model3)
+```
+
+$H_0$: There is no difference in the models  
+$H_A$: there is a difference in the models  
+
+Since the p value is 4.994 we reject the null hypothesis. THere is a difference between model 1 and model 3. We conclude that model 3 is a better fit than model 1.
