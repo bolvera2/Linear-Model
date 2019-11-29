@@ -10,80 +10,119 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+```{r include=FALSE}
+require(tidyverse)
+require(tigerstats)
+require(rgl)
+require(knitr)
+if(!require("rglwidget")) {install.packages("rglwidget");require("rglwidget")}
+data <- read.csv(file = "http://onlinestatbook.com/case_studies_rvls/physical_strength/data.txt",sep = "",header = TRUE)
+```
 ```{r}
-myData = read.csv('RawData.csv')
+plot(SIMS~ARM,data=data)
 ```
 
-
-# First Model:
-SIMS is a function of ARM
+```{r}
+basicNN <- ggplot(data,aes(y=SIMS,x=ARM))
+```
+```{r}
+basicNN + geom_point()
+```
+```{r}
+basicNN + geom_point(aes(col=ARM)) 
+```
+```{r}
+cor(SIMS~ARM,data=data)
+```
+```{r}
+model.1 <- lm(SIMS~ARM,data=data)
+summary.lm(model.1)
+```
+```{r}
+basicNN + geom_point(aes(col=ARM)) + geom_smooth(method=lm)
+``` 
 
 ```{r}
-model1 = lm(SIMS~ARM, data=myData)
-summary(model1)
+x=data.frame(GRIP=94, ARM=88)
+predict.lm(model.1,x,interval = "prediction")
 ```
 
-predict SIMS fro ARM = 88
+The 95% predictions intervals are between 0.706-3.13
+
+Now for SIMs the function of GRIP
+
 
 ```{r}
-x = data.frame(GRIP=94, ARM=88)
-predSIMS = predict.lm(model1, x)
-print(predSIMS)
+plot(SIMS~GRIP,data=data)
 ```
-
-prediction interval:
-```{r}
-predict(model1, x, interval="predict", level=0.95)
-```
-
-
-# Second model SIMS is a function of GRIP
 
 ```{r}
-model2 = lm(SIMS~GRIP, data=myData)
-summary(model2)
+basicNN <- ggplot(data,aes(y=SIMS,x=GRIP))
 ```
-
-predict SIMS fro GRIP = 94
+```{r}
+basicNN + geom_point()
+```
+```{r}
+basicNN + geom_point(aes(col=GRIP)) 
+```
+```{r}
+cor(SIMS~GRIP,data=data)
+```
+```{r}
+model.2 <- lm(SIMS~GRIP,data=data)
+summary.lm(model.2)
+```
+```{r}
+basicNN + geom_point(aes(col=GRIP)) + geom_smooth(method=lm)
+``` 
 
 ```{r}
-predictSIMS2 = predict.lm(model2, x)
-print(predictSIMS2)
+x=data.frame(GRIP=94, ARM=88)
+predict.lm(model.2,x,interval = "prediction")
 ```
 
+The 95% predictions intervals are between -0.536-2.03
 
-prediction interval:
+Now for the SIMs function of ARM+GRIP
 
 ```{r}
-predict(model2, x, interval="predict")
+plot(SIMS~ARM+GRIP,data=data,xlab = "ARM+GRIP")
 ```
-
-# Third Model SIMS is a function of GRIP + ARM
 
 ```{r}
-model3 = lm(SIMS~GRIP+ARM, data=myData)
-summary(model3)
+basicNN <- ggplot(data,aes(y=SIMS,x=ARM+GRIP))
 ```
-
-predict SIMS fro ARM=88 and GRIP=94
+```{r}
+basicNN + geom_point()
+```
+```{r}
+basicNN + geom_point(aes(col=ARM+GRIP)) 
+```
+```{r}
+cor(SIMS~ARM+GRIP,data=data)
+```
+```{r}
+model.3 <- lm(SIMS~ARM+GRIP,data=data)
+summary.lm(model.3)
+```
+```{r}
+basicNN + geom_point(aes(col=ARM+GRIP)) + geom_smooth(method=lm)
+``` 
 
 ```{r}
-predictSIMS3 = predict.lm(model3, x)
-print(predictSIMS3)
+x=data.frame(GRIP=94, ARM=88)
+predict.lm(model.3,x,interval = "prediction")
 ```
-
-
-prediction interval for model3
-
-blah .. blah..
-
-comparison between models 1 and 3
 
 ```{r}
-anova(model1, model3)
+a=anova(model.1,model.3)
+print(a)
+str(a)
 ```
 
-$H_0$: There is no difference in the models  
-$H_A$: there is a difference in the models  
+$H_0$:  There is no difference in the models.  We fail to reject the null hypothesis showing that there is no difference between arm strength vs. arm+grip strength
 
-Since the p value is 4.994 we reject the null hypothesis. THere is a difference between model 1 and model 3. We conclude that model 3 is a better fit than model 1.
+$H_A$:  There is no difference in the models.  We reject the null hypothesis showing that there is a difference between arm strength vs arm+grip strength
+
+In this data test we find our P-value to be 4.994e-06 < 0.05 so we fail to reject the null hypothesis thus we can conclude that there is no difference between arm strength and arm plus grip strength. We may also conclude that our overall simulation for arm+grip strenght is a better model prediction than our arm strength model.
+
